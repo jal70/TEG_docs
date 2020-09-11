@@ -15,7 +15,7 @@
 * Leer archivo .csv
 * Loop sobre las lineas
 	* Cargar diccionario
-	* Generar archivo del veredicto: CI_estudiante_apellido_nombre.odt
+	* Generar archivo del veredicto: correlativo_CI_estudiante_apellido_nombre.odt
 	* Sustituir valores en el archivo de veredicto
 	* Agregar linea en historial de veredictos generados por enviar:
 		* Copiar linea del archivo original

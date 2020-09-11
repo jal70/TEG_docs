@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 from ezodf import newdoc
 import os
+from os import path
 import zipfile
 import tempfile
+import unidecode
+import datetime
 #
 def updateZip(zipname, filename, data):
     # This function and general algoritm from:
@@ -102,15 +105,29 @@ def diccionario(lista_claves,lista_contenido):
         dic[lista_claves[13]]='el Tutor'
     return(dic)
 #
-ejemplo_contenido=lee_pendientes('lista_veredictos.csv')[1]
+veredictos_a_procesar=lee_pendientes('../input/lista_veredictos.csv')
 #
-nombre_especifico=diccionario(nombre_generico,ejemplo_contenido)
+anho=str(datetime.datetime.now().year)
+file_tramite='../historial/' + 'tramites_por_enviar_' + anho + '.csv'
+if not(os.path.isfile(file_tramite)):
+    f=open(file_tramite,"w+")
+    f.write('|'.join(veredictos_a_procesar[0])+'\n')
+    f.close()
+for i in range(1,len(veredictos_a_procesar)):
+    namef = '../temp/' + veredictos_a_procesar[i][0].zfill(3) + '_CI_' + veredictos_a_procesar[i][3] + '_' + unidecode.unidecode(veredictos_a_procesar[i][1]).replace(' ','_') + '.odt'
+    odt = newdoc(doctype='odt', filename=namef, template='../origen/plantilla_veredicto.odt')
+    odt.save()
+    #print(namef)
+    nombre_especifico=diccionario(nombre_generico,veredictos_a_procesar[i])
+    a = zipfile.ZipFile(namef)
+    content = a.read('content.xml')
+    content = str(content.decode(encoding='utf8'))
+    for j in nombre_generico:
+        content = str.replace(content,j, nombre_especifico[j])
+    content = content.encode(encoding='utf8') #https://www.journaldev.com/23617/python-string-encode-decode
+    updateZip(namef, 'content.xml', content)
+    f=open(file_tramite,"a+")
+    f.write('|'.join(veredictos_a_procesar[i])+'\n')
+    f.close()
 #
-a = zipfile.ZipFile('test/plantilla_veredicto.odt')
-content = a.read('content.xml')
-content = str(content.decode(encoding='utf8'))
-for i in nombre_generico:
-    print(i,nombre_especifico[i])
-    content = str.replace(content,i, nombre_especifico[i])
-content = content.encode(encoding='utf8') #https://www.journaldev.com/23617/python-string-encode-decode
-updateZip('test/prueba.odt', 'content.xml', content)
+os.remove("../input/lista_veredictos.csv") 
