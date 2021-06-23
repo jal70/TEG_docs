@@ -4,3 +4,4 @@ tramites_enviados*.csv
 *_CI_*
 CI_*
 prueba.odt
+.ipynb_checkpoints/
